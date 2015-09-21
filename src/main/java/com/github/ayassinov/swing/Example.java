@@ -1,10 +1,13 @@
 package com.github.ayassinov.swing;
 
 import com.github.ayassinov.swing.model.Classifier;
-import com.github.ayassinov.swing.ui.BaseTable;
 import com.github.ayassinov.swing.ui.Column;
+import com.github.ayassinov.swing.ui.UpdatableTableCell;
+import com.github.ayassinov.swing.ui.TableModelBinding;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 /**
@@ -14,7 +17,7 @@ public class Example extends JFrame {
 
     public Example(String title) {
         setTitle(title);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(500, 600));
 
         createUI();
@@ -39,31 +42,45 @@ public class Example extends JFrame {
     }
 
     private JTable createTable() {
-        final MyTable myTable = new MyTable();
-        myTable.setValues(Classifier.listAll());
-        return myTable.getTable();
-    }
-
-    private class MyTable extends BaseTable<Classifier> {
-        public MyTable() {
-            super(
-                    Column.builder()
-                            .add("name", "date", "value")
-                            .build()
-            );
-        }
-
-
-        @Override
-        public Object getValueAtColumnIndex(Classifier value, int columnIndex) {
-            if (columnIndex == 0)
-                return value.getName();
-            else if (columnIndex == 1)
-                return value.getCreatedAt();
-            else if(columnIndex == 2){
-                return value.getDefaultAmount();
+        final TableCellRenderer render = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (row % 2 == 0) {
+                    c.setBackground(Color.LIGHT_GRAY);
+                } else {
+                    c.setBackground(Color.GRAY);
+                }
+                return c;
             }
-            return null;
-        }
+        };
+
+        final java.util.List<Column> columns = Column.builder()
+                .add("name", true, render)
+                .add("date", render)
+                .add("value", render)
+                .build();
+
+        final TableModelBinding<Classifier> tableModelBinding = new TableModelBinding<Classifier>(columns, new UpdatableTableCell<Classifier>() {
+            public Object getValueAtColumnIndex(Classifier value, int columnIndex) {
+                if (columnIndex == 0)
+                    return value.getName();
+                else if (columnIndex == 1)
+                    return value.getCreatedAt();
+                else if (columnIndex == 2) {
+                    return value.getDefaultAmount();
+                }
+                return null;
+            }
+
+            public void setValueAtColumnIndex(Classifier value, Object newValue, int columnIndex) {
+                if (columnIndex == 0)
+                    value.setName((String) newValue);
+
+            }
+        });
+
+        tableModelBinding.getTableModel().setValues(Classifier.listAll());
+        return tableModelBinding.getJTable();
     }
 }

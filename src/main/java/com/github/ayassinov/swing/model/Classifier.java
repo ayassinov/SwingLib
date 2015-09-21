@@ -1,6 +1,7 @@
 package com.github.ayassinov.swing.model;
 
 import com.google.common.collect.ImmutableList;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Calendar;
@@ -11,10 +12,11 @@ import java.util.List;
  * @author ayassinov on 19/09/15.
  */
 @Data
+@AllArgsConstructor
 public class Classifier {
 
     private final int id;
-    private final String name;
+    private String name;
     private final Date createdAt;
     private final boolean active;
     private final Double defaultAmount;
