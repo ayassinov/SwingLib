@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class Classifier {
+public class Classifier implements Serializable {
 
     private final int id;
     private String name;
